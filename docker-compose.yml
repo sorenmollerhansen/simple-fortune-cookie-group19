@@ -1,11 +1,11 @@
 services:
   backend:
-    image: backend:latest
+    build: ./backend
     ports:
       - 9000:9000
 
   frontend:
-    image: frontend:latest
+    build: ./frontend
     depends_on:
       - backend
     ports:
