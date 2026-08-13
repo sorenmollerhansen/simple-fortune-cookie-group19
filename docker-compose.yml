@@ -1,0 +1,12 @@
+services:
+  backend:
+    image: backend:latest
+    ports:
+      - 9000:9000
+
+  frontend:
+    image: frontend:latest
+    depends_on:
+      - backend
+    ports:
+      - 8080:8080
