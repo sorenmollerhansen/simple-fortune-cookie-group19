@@ -36,7 +36,7 @@ jobs:
   push-images:
     needs: build-and-test
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
@@ -63,3 +63,23 @@ jobs:
           tags: |
             ghcr.io/sorenmollerhansen/sfc-${{ matrix.app }}:${{ github.sha }}
             ghcr.io/sorenmollerhansen/sfc-${{ matrix.app }}:latest
+  
+  deploy:
+    needs: push-images
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write kubeconfig to disk
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+
+      - name: Deploy to Kubernetes
+        run: kubectl --kubeconfig kubeconfig -n student-17 apply -f k8s/
+
+      - name: Wait for rollout
+        run: |
+          kubectl --kubeconfig kubeconfig -n student-17 rollout status deploy/backend
+          kubectl --kubeconfig kubeconfig -n student-17 rollout status deploy/frontend            
