@@ -82,4 +82,10 @@ jobs:
       - name: Wait for rollout
         run: |
           kubectl --kubeconfig kubeconfig -n student-17 rollout status deploy/backend
-          kubectl --kubeconfig kubeconfig -n student-17 rollout status deploy/frontend            
+          kubectl --kubeconfig kubeconfig -n student-17 rollout status deploy/frontend
+
+  test-kubeconfig:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+      - run: kubectl --kubeconfig kubeconfig -n student-17 get pods            
