@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.21'
 
       - name: Build frontend
         working-directory: frontend
@@ -32,3 +32,34 @@ jobs:
       - name: Test frontend
         working-directory: frontend
         run: go test
+
+  push-images:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        app: [frontend, backend]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.app }}
+          push: true
+          tags: |
+            ghcr.io/sorenmollerhansen/sfc-${{ matrix.app }}:${{ github.sha }}
+            ghcr.io/sorenmollerhansen/sfc-${{ matrix.app }}:latest
