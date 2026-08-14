@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backend
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - image: "ghcr.io/sorenmollerhansen/sfc-backend:b5f2c5bbaf5cc8d21c0ad87f80915a313c3a9b37"
+          name: backend
+          ports:
+            - containerPort: 9000
+status: {}

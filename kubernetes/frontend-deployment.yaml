@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - image: "ghcr.io/sorenmollerhansen/sfc-frontend:b5f2c5bbaf5cc8d21c0ad87f80915a313c3a9b37"
+          name: frontend
+          ports:
+            - containerPort: 8080
+          resources: {}
+          env:
+            - name: BACKEND_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_host
+            - name: BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_port
+
